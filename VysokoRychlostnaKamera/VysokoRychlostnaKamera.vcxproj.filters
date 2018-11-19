@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="View">
+      <UniqueIdentifier>{02b36db8-08df-4e5c-a59a-5c1243736c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="COntroller">
+      <UniqueIdentifier>{588e46bf-ba8a-4755-8377-6fd9cbc256c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VysokoRychlostnaKamera.h">
@@ -33,6 +39,21 @@
     <ClInclude Include="MainDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AsynchronousGrabDlg.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiController.h">
+      <Filter>COntroller</Filter>
+    </ClInclude>
+    <ClInclude Include="AsynchronousGrab.h">
+      <Filter>COntroller</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraObserver.h">
+      <Filter>COntroller</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameObserver.h">
+      <Filter>COntroller</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VysokoRychlostnaKamera.cpp">
@@ -46,6 +67,21 @@
     </ClCompile>
     <ClCompile Include="MainDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AsynchronousGrabDlg.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="ApiController.cpp">
+      <Filter>COntroller</Filter>
+    </ClCompile>
+    <ClCompile Include="AsynchronousGrab.cpp">
+      <Filter>COntroller</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraObserver.cpp">
+      <Filter>COntroller</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameObserver.cpp">
+      <Filter>COntroller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

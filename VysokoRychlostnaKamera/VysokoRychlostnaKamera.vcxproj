@@ -115,9 +115,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Allied Vision\Vimba_2.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>VimbaCPP.lib;VimbaImageTransform.lib;</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -183,6 +185,11 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ApiController.h" />
+    <ClInclude Include="AsynchronousGrab.h" />
+    <ClInclude Include="AsynchronousGrabDlg.h" />
+    <ClInclude Include="CameraObserver.h" />
+    <ClInclude Include="FrameObserver.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -191,6 +198,11 @@
     <ClInclude Include="VysokoRychlostnaKameraDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApiController.cpp" />
+    <ClCompile Include="AsynchronousGrab.cpp" />
+    <ClCompile Include="AsynchronousGrabDlg.cpp" />
+    <ClCompile Include="CameraObserver.cpp" />
+    <ClCompile Include="FrameObserver.cpp" />
     <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
