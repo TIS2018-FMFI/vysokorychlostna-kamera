@@ -33,6 +33,21 @@
     <ClInclude Include="MainDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ApiController.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AsynchronousGrab.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AsynchronousGrabDlg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraObserver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameObserver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VysokoRychlostnaKamera.cpp">
@@ -47,10 +62,28 @@
     <ClCompile Include="MainDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ApiController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AsynchronousGrab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AsynchronousGrabDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VysokoRychlostnaKamera.rc">
       <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="res\AsynchronousGrab.rc">
+      <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
