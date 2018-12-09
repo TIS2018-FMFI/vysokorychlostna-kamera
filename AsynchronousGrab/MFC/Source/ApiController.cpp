@@ -145,6 +145,17 @@ VmbErrorType ApiController::StartContinuousImageAcquisition( const std::string &
     VmbErrorType res = m_system.OpenCameraByID( rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera );
     if( VmbErrorSuccess == res )
     {
+		// set roi
+		VmbInt64_t x = 300;
+		res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		if (VmbErrorSuccess != res)
+		{
+			printf("rip");
+		}
+		else if (VmbErrorSuccess == res)
+		{
+			printf("good");
+		}
         // Set the GeV packet size to the highest possible value
         // (In this example we do not test whether this cam actually is a GigE cam)
         FeaturePtr pCommandFeature;
