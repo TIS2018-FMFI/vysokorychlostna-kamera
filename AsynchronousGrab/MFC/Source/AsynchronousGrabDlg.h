@@ -38,6 +38,7 @@
 #include <chrono>
 
 using AVT::VmbAPI::Examples::ApiController;
+using namespace std::chrono;
 
 class CAsynchronousGrabDlg : public CDialog
 {
@@ -133,7 +134,8 @@ private:
     CButton m_ButtonStartStop;
     CStatic m_PictureBoxStream;
 
-	time_t oldTime;
+	//time_t oldTime;
+	milliseconds oldTime;
 public:
 	CEdit current_fps_label;
 };

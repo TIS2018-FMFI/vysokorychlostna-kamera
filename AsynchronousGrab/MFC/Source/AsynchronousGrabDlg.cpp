@@ -45,7 +45,8 @@ CAsynchronousGrabDlg::CAsynchronousGrabDlg( CWnd* pParent )
 {
     m_hIcon = AfxGetApp()->LoadIcon( IDR_MAINFRAME );
 	//current_fps_label = GetDlgItem(IDC_EDIT_CURRENT_FPS);
-	time(&oldTime);
+	//time(&oldTime);
+	oldTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
 }
 
 BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
@@ -183,14 +184,12 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
                 if( VmbErrorSuccess == err )
                 {
 					// Calculate fps
-					time_t newTime;
-					time(&newTime);
-					time_t delta = oldTime - newTime;
+					milliseconds newTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
+					milliseconds delta = newTime - oldTime;
+					long long fps = 1000.0/delta.count();
 					oldTime = newTime;
 
-					std::stringstream ss;
-					ss << delta;
-					std::string s = ss.str();
+					std::string s = std::to_string(fps);
 					CString s2(s.c_str());
 					current_fps_label.SetWindowText((LPCTSTR)s2);
 					UpdateData(FALSE);
