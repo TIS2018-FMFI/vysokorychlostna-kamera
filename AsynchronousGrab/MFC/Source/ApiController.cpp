@@ -146,16 +146,35 @@ VmbErrorType ApiController::StartContinuousImageAcquisition( const std::string &
     if( VmbErrorSuccess == res )
     {
 		// set roi
-		VmbInt64_t x = 300;
-		res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
-		if (VmbErrorSuccess != res)
+		VmbInt64_t x = 0.5;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string name = "OffsetX";
+		FeaturePtr      pFeature;
+		VmbErrorType    result;
+		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
+		if (VmbErrorSuccess == result)
 		{
-			printf("rip");
+			result = SP_ACCESS(pFeature)->SetValue(x);
 		}
-		else if (VmbErrorSuccess == res)
+
+		VmbInt64_t y = 0.5;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string name = "OffsetY";
+		FeaturePtr      pFeature;
+		VmbErrorType    result;
+		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
+		if (VmbErrorSuccess == result)
 		{
-			printf("good");
+			result = SP_ACCESS(pFeature)->SetValue(y);
 		}
+		//if (VmbErrorSuccess != res)
+		//{
+		//	printf("rip");
+		//}
+		//else if (VmbErrorSuccess == res)
+		//{
+		//	printf("good");
+		//}
         // Set the GeV packet size to the highest possible value
         // (In this example we do not test whether this cam actually is a GigE cam)
         FeaturePtr pCommandFeature;
