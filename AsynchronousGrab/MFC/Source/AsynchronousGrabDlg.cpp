@@ -44,6 +44,8 @@ CAsynchronousGrabDlg::CAsynchronousGrabDlg( CWnd* pParent )
     , m_bIsStreaming( false )
 {
     m_hIcon = AfxGetApp()->LoadIcon( IDR_MAINFRAME );
+	//current_fps_label = GetDlgItem(IDC_EDIT_CURRENT_FPS);
+	time(&oldTime);
 }
 
 BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
@@ -139,11 +141,11 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
 
     if( false == m_bIsStreaming )
     {
-        m_ButtonStartStop.SetWindowText( _TEXT( "Start Image Acquisition" ) );
+        m_ButtonStartStop.SetWindowText( _TEXT( "|>" ) );
     }
     else
     {
-        m_ButtonStartStop.SetWindowText( _TEXT( "Stop Image Acquisition" ) );
+        m_ButtonStartStop.SetWindowText( _TEXT( "||" ) );
     }
 }
 
@@ -180,6 +182,19 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
                 err = pFrame->GetImageSize( nSize );
                 if( VmbErrorSuccess == err )
                 {
+					// Calculate fps
+					time_t newTime;
+					time(&newTime);
+					time_t delta = oldTime - newTime;
+					oldTime = newTime;
+
+					std::stringstream ss;
+					ss << delta;
+					std::string s = ss.str();
+					CString s2(s.c_str());
+					current_fps_label.SetWindowText((LPCTSTR)s2);
+					UpdateData(FALSE);
+
                     VmbPixelFormatType ePixelFormat = m_ApiController.GetPixelFormat();
                     CopyToImage( pBuffer,ePixelFormat, m_Image );
                     // Display it
@@ -372,11 +387,12 @@ HCURSOR CAsynchronousGrabDlg::OnQueryDragIcon()
 
 void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 {
-    CDialog::DoDataExchange( pDX );
-    DDX_Control( pDX, IDC_LIST_CAMERAS, m_ListBoxCameras );
-    DDX_Control( pDX, IDC_LIST_LOG, m_ListLog );
-    DDX_Control( pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop );
-    DDX_Control( pDX, IDC_PICTURE_STREAM, m_PictureBoxStream );
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_CAMERAS, m_ListBoxCameras);
+	DDX_Control(pDX, IDC_LIST_LOG, m_ListLog);
+	DDX_Control(pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop);
+	DDX_Control(pDX, IDC_PICTURE_STREAM, m_PictureBoxStream);
+	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
 }
 
 template <typename T>

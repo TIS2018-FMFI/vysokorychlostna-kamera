@@ -35,6 +35,7 @@
 #include <VimbaCPP/Include/VimbaCPP.h>
 
 #include <ApiController.h>
+#include <chrono>
 
 using AVT::VmbAPI::Examples::ApiController;
 
@@ -131,5 +132,9 @@ private:
     CListBox m_ListLog;
     CButton m_ButtonStartStop;
     CStatic m_PictureBoxStream;
+
+	time_t oldTime;
+public:
+	CEdit current_fps_label;
 };
 
