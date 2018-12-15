@@ -461,6 +461,8 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 	CString text;
 	int x = 0;
 	int y = 0;
+	int x2 = 0;
+	int y2 = 0;
 	int w = 0;
 	int h = 0;
 	try
@@ -470,16 +472,24 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 		UpperLeftY.GetWindowText(text);
 		y = _wtoi(text);
 		LowerRightX.GetWindowText(text);
-		w = _wtoi(text);
+		x2 = _wtoi(text);
 		LowerRightY.GetWindowText(text);
-		h = _wtoi(text);
+		y2 = _wtoi(text);
 	}
 	catch (const std::exception&)
 	{
 		Log(_TEXT("ROI wrong input"));
 	}
+
+	w = x2 - x;
+	h = y2 - y;
+	if (w <= 0 || h <= 0)
+	{
+		Log(_TEXT("ROI Lower right is wrong"));
+		return;
+	}
+
 	int nRow = m_ListBoxCameras.GetCurSel();
-	
 	if (-1 < nRow)
 	{
 		if (x + w > m_ApiController.GetMaxWidth(m_cameras[nRow]) || y + h > m_ApiController.GetMaxHeight(m_cameras[nRow]))
