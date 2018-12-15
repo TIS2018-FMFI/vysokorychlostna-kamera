@@ -25,7 +25,6 @@
 #define IDC_LIST_ITEMS                  1025
 #define IDC_STATIC_FOLDER_LABEL         1027
 #define IDC_EDIT_CURRENT_FPS            1029
-#define IDC_BUTTON1                     1030
 #define IDC_BUTTON_SET_ROI              1030
 
 // Next default values for new objects

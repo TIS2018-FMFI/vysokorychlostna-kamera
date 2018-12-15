@@ -395,6 +395,8 @@ void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
 	DDX_Control(pDX, IDC_INPUT_UL_X, UppeLeftX);
 	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
+	DDX_Control(pDX, IDC_INPUT_LR_X, LowerRightX);
+	DDX_Control(pDX, IDC_INPUT_LR_Y, LowerRightY);
 }
 
 template <typename T>
@@ -457,18 +459,33 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 	CString text;
 	int x = 0;
 	int y = 0;
+	int w = 0;
+	int h = 0;
 	try
 	{
 		UppeLeftX.GetWindowText(text);
 		x = _wtoi(text);
 		UpperLeftY.GetWindowText(text);
 		y = _wtoi(text);
+		LowerRightX.GetWindowText(text);
+		w = _wtoi(text);
+		LowerRightY.GetWindowText(text);
+		h = _wtoi(text);
 	}
 	catch (const std::exception&)
 	{
-
+		Log(_TEXT("ROI wrong input"));
 	}
 	int nRow = m_ListBoxCameras.GetCurSel();
-	if(-1 < nRow)
-		m_ApiController.SetROI(x, y, 600, 600, m_cameras[nRow]);
+	
+	if (-1 < nRow)
+	{
+		if (x + w > m_ApiController.GetMaxWidth(m_cameras[nRow]) || y + h > m_ApiController.GetMaxHeight(m_cameras[nRow]))
+		{
+			Log(_TEXT("ROI out of camera resolution"));
+			return;
+		}
+		m_ApiController.SetROI(x, y, w, h, m_cameras[nRow]);
+		Log(_TEXT("ROI set"));
+	}
 }

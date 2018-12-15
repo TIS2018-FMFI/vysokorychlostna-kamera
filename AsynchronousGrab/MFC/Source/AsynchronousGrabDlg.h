@@ -141,5 +141,7 @@ public:
 	afx_msg void OnBnClickedButtonSetRoi();
 	CEdit UppeLeftX;
 	CEdit UpperLeftY;
+	CEdit LowerRightX;
+	CEdit LowerRightY;
 };
 

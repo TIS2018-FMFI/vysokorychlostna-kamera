@@ -179,6 +179,30 @@ inline VmbErrorType SetFeatureIntValue( const CameraPtr &camera, const std::stri
     return result;
 }
 
+int ApiController::GetMaxWidth(const std::string &rStrCameraID)
+{
+	VmbInt64_t width = -1;
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		res = GetFeatureIntValue(m_pCamera, "WidthMax", width);
+	}
+	SP_ACCESS(m_pCamera)->Close();
+	return width;
+}
+
+int ApiController::GetMaxHeight(const std::string &rStrCameraID)
+{
+	VmbInt64_t height = -1;
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		res = GetFeatureIntValue(m_pCamera, "HeightMax", height);
+	}
+	SP_ACCESS(m_pCamera)->Close();
+	return height;
+}
+
 //
 // Opens the given camera
 // Sets the maximum possible Ethernet packet size
