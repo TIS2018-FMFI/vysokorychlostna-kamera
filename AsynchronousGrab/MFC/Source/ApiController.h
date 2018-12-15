@@ -57,6 +57,8 @@ class ApiController
     ApiController();
     ~ApiController();
 
+	void SetROI(int x,int y,int w,int h, const std::string &rStrCameraID);
+
     //
     // Starts the Vimba API and loads all transport layers
     //

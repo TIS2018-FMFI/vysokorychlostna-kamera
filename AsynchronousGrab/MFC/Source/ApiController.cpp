@@ -46,6 +46,60 @@ ApiController::~ApiController()
 {
 }
 
+void ApiController::SetROI(int x, int y, int w, int h, const std::string &rStrCameraID)
+{
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		VmbInt64_t width = w;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string namew = "Width";
+		FeaturePtr      pFeaturew;
+		VmbErrorType    resultw;
+		resultw = SP_ACCESS(m_pCamera)->GetFeatureByName(namew.c_str(), pFeaturew);
+		if (VmbErrorSuccess == resultw)
+		{
+			resultw = SP_ACCESS(pFeaturew)->SetValue(width);
+		}
+
+		VmbInt64_t height = h;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string nameh = "Height";
+		FeaturePtr      pFeatureh;
+		VmbErrorType    resulth;
+		resulth = SP_ACCESS(m_pCamera)->GetFeatureByName(nameh.c_str(), pFeatureh);
+		if (VmbErrorSuccess == resulth)
+		{
+			resulth = SP_ACCESS(pFeatureh)->SetValue(height);
+		}
+
+		VmbInt64_t offsetx = x;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string name = "OffsetX";
+		FeaturePtr      pFeature;
+		VmbErrorType    result;
+		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
+		if (VmbErrorSuccess == result)
+		{
+			result = SP_ACCESS(pFeature)->SetValue(offsetx);
+		}
+
+		VmbInt64_t offsety = y;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string namey = "OffsetY";
+		FeaturePtr      pFeature2;
+		VmbErrorType    result2;
+		result2 = SP_ACCESS(m_pCamera)->GetFeatureByName(namey.c_str(), pFeature2);
+		if (VmbErrorSuccess == result2)
+		{
+			result2 = SP_ACCESS(pFeature)->SetValue(offsety);
+		}
+	}
+
+	//close the camera
+	SP_ACCESS(m_pCamera)->Close();
+}
+
 //
 // Translates Vimba error codes to readable error messages
 //
@@ -146,27 +200,9 @@ VmbErrorType ApiController::StartContinuousImageAcquisition( const std::string &
     if( VmbErrorSuccess == res )
     {
 		// set roi
-		VmbInt64_t x = 0.5;
-		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
-		std::string name = "OffsetX";
-		FeaturePtr      pFeature;
-		VmbErrorType    result;
-		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
-		if (VmbErrorSuccess == result)
-		{
-			result = SP_ACCESS(pFeature)->SetValue(x);
-		}
 
-		VmbInt64_t y = 0.5;
-		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
-		std::string name = "OffsetY";
-		FeaturePtr      pFeature;
-		VmbErrorType    result;
-		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
-		if (VmbErrorSuccess == result)
-		{
-			result = SP_ACCESS(pFeature)->SetValue(y);
-		}
+		
+
 		//if (VmbErrorSuccess != res)
 		//{
 		//	printf("rip");

@@ -58,6 +58,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     // Here we add the event handlers for Vimba events
     ON_MESSAGE( WM_FRAME_READY, OnFrameReady )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
+	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -392,6 +393,8 @@ void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control(pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop);
 	DDX_Control(pDX, IDC_PICTURE_STREAM, m_PictureBoxStream);
 	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
+	DDX_Control(pDX, IDC_INPUT_UL_X, UppeLeftX);
+	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
 }
 
 template <typename T>
@@ -444,4 +447,28 @@ void CAsynchronousGrabDlg::OnPaint()
             m_Image.StretchBlt( dc.m_hDC, rect );
         }
     }
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData(TRUE);
+	CString text;
+	int x = 0;
+	int y = 0;
+	try
+	{
+		UppeLeftX.GetWindowText(text);
+		x = _wtoi(text);
+		UpperLeftY.GetWindowText(text);
+		y = _wtoi(text);
+	}
+	catch (const std::exception&)
+	{
+
+	}
+	int nRow = m_ListBoxCameras.GetCurSel();
+	if(-1 < nRow)
+		m_ApiController.SetROI(x, y, 600, 600, m_cameras[nRow]);
 }

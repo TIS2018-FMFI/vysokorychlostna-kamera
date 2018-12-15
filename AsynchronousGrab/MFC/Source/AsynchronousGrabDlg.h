@@ -138,5 +138,8 @@ private:
 	milliseconds oldTime;
 public:
 	CEdit current_fps_label;
+	afx_msg void OnBnClickedButtonSetRoi();
+	CEdit UppeLeftX;
+	CEdit UpperLeftY;
 };
 
