@@ -144,10 +144,12 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
     if( false == m_bIsStreaming )
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "|>" ) );
+		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(TRUE);
     }
     else
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "||" ) );
+		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(FALSE);
     }
 }
 
