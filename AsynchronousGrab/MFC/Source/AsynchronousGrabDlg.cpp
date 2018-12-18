@@ -59,6 +59,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     ON_MESSAGE( WM_FRAME_READY, OnFrameReady )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
+	ON_BN_CLICKED(IDC_BUTTON_PLAYBACK_TEST, &CAsynchronousGrabDlg::OnBnClickedButtonPlaybackTest)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -500,4 +501,14 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 		m_ApiController.SetROI(x, y, w, h, m_cameras[nRow]);
 		Log(_TEXT("ROI set"));
 	}
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonPlaybackTest()
+{
+	// TODO: Add your control notification handler code here
+	CString pngPath = L"c:\\test.png";
+	CImage pngImage;
+	int fps = 24;
+	pngImage.Load(pngPath);
 }

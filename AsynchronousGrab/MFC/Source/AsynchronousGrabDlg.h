@@ -143,5 +143,6 @@ public:
 	CEdit UpperLeftY;
 	CEdit LowerRightX;
 	CEdit LowerRightY;
+	afx_msg void OnBnClickedButtonPlaybackTest();
 };
 
