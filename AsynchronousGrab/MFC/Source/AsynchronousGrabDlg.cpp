@@ -44,6 +44,9 @@ CAsynchronousGrabDlg::CAsynchronousGrabDlg( CWnd* pParent )
     , m_bIsStreaming( false )
 {
     m_hIcon = AfxGetApp()->LoadIcon( IDR_MAINFRAME );
+	//current_fps_label = GetDlgItem(IDC_EDIT_CURRENT_FPS);
+	//time(&oldTime);
+	oldTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
 }
 
 BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
@@ -55,6 +58,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     // Here we add the event handlers for Vimba events
     ON_MESSAGE( WM_FRAME_READY, OnFrameReady )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
+	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -139,11 +143,13 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
 
     if( false == m_bIsStreaming )
     {
-        m_ButtonStartStop.SetWindowText( _TEXT( "Start Image Acquisition" ) );
+        m_ButtonStartStop.SetWindowText( _TEXT( "|>" ) );
+		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(TRUE);
     }
     else
     {
-        m_ButtonStartStop.SetWindowText( _TEXT( "Stop Image Acquisition" ) );
+        m_ButtonStartStop.SetWindowText( _TEXT( "||" ) );
+		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(FALSE);
     }
 }
 
@@ -180,6 +186,17 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
                 err = pFrame->GetImageSize( nSize );
                 if( VmbErrorSuccess == err )
                 {
+					// Calculate fps
+					milliseconds newTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
+					milliseconds delta = newTime - oldTime;
+					long long fps = 1000.0/delta.count();
+					oldTime = newTime;
+
+					std::string s = std::to_string(fps);
+					CString s2(s.c_str());
+					current_fps_label.SetWindowText((LPCTSTR)s2);
+					UpdateData(FALSE);
+
                     VmbPixelFormatType ePixelFormat = m_ApiController.GetPixelFormat();
                     CopyToImage( pBuffer,ePixelFormat, m_Image );
                     // Display it
@@ -372,11 +389,16 @@ HCURSOR CAsynchronousGrabDlg::OnQueryDragIcon()
 
 void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 {
-    CDialog::DoDataExchange( pDX );
-    DDX_Control( pDX, IDC_LIST_CAMERAS, m_ListBoxCameras );
-    DDX_Control( pDX, IDC_LIST_LOG, m_ListLog );
-    DDX_Control( pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop );
-    DDX_Control( pDX, IDC_PICTURE_STREAM, m_PictureBoxStream );
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_CAMERAS, m_ListBoxCameras);
+	DDX_Control(pDX, IDC_LIST_LOG, m_ListLog);
+	DDX_Control(pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop);
+	DDX_Control(pDX, IDC_PICTURE_STREAM, m_PictureBoxStream);
+	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
+	DDX_Control(pDX, IDC_INPUT_UL_X, UppeLeftX);
+	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
+	DDX_Control(pDX, IDC_INPUT_LR_X, LowerRightX);
+	DDX_Control(pDX, IDC_INPUT_LR_Y, LowerRightY);
 }
 
 template <typename T>
@@ -429,4 +451,53 @@ void CAsynchronousGrabDlg::OnPaint()
             m_Image.StretchBlt( dc.m_hDC, rect );
         }
     }
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData(TRUE);
+	CString text;
+	int x = 0;
+	int y = 0;
+	int x2 = 0;
+	int y2 = 0;
+	int w = 0;
+	int h = 0;
+	try
+	{
+		UppeLeftX.GetWindowText(text);
+		x = _wtoi(text);
+		UpperLeftY.GetWindowText(text);
+		y = _wtoi(text);
+		LowerRightX.GetWindowText(text);
+		x2 = _wtoi(text);
+		LowerRightY.GetWindowText(text);
+		y2 = _wtoi(text);
+	}
+	catch (const std::exception&)
+	{
+		Log(_TEXT("ROI wrong input"));
+	}
+
+	w = x2 - x;
+	h = y2 - y;
+	if (w <= 0 || h <= 0)
+	{
+		Log(_TEXT("ROI Lower right is wrong"));
+		return;
+	}
+
+	int nRow = m_ListBoxCameras.GetCurSel();
+	if (-1 < nRow)
+	{
+		if (x + w > m_ApiController.GetMaxWidth(m_cameras[nRow]) || y + h > m_ApiController.GetMaxHeight(m_cameras[nRow]))
+		{
+			Log(_TEXT("ROI out of camera resolution"));
+			return;
+		}
+		m_ApiController.SetROI(x, y, w, h, m_cameras[nRow]);
+		Log(_TEXT("ROI set"));
+	}
 }

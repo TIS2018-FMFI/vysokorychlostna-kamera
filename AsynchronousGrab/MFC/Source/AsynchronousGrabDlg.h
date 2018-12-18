@@ -35,8 +35,10 @@
 #include <VimbaCPP/Include/VimbaCPP.h>
 
 #include <ApiController.h>
+#include <chrono>
 
 using AVT::VmbAPI::Examples::ApiController;
+using namespace std::chrono;
 
 class CAsynchronousGrabDlg : public CDialog
 {
@@ -131,5 +133,15 @@ private:
     CListBox m_ListLog;
     CButton m_ButtonStartStop;
     CStatic m_PictureBoxStream;
+
+	//time_t oldTime;
+	milliseconds oldTime;
+public:
+	CEdit current_fps_label;
+	afx_msg void OnBnClickedButtonSetRoi();
+	CEdit UppeLeftX;
+	CEdit UpperLeftY;
+	CEdit LowerRightX;
+	CEdit LowerRightY;
 };
 

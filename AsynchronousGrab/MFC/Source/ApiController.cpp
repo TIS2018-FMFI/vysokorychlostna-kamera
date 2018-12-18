@@ -46,6 +46,60 @@ ApiController::~ApiController()
 {
 }
 
+void ApiController::SetROI(int x, int y, int w, int h, const std::string &rStrCameraID)
+{
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		VmbInt64_t width = w;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string namew = "Width";
+		FeaturePtr      pFeaturew;
+		VmbErrorType    resultw;
+		resultw = SP_ACCESS(m_pCamera)->GetFeatureByName(namew.c_str(), pFeaturew);
+		if (VmbErrorSuccess == resultw)
+		{
+			resultw = SP_ACCESS(pFeaturew)->SetValue(width);
+		}
+
+		VmbInt64_t height = h;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string nameh = "Height";
+		FeaturePtr      pFeatureh;
+		VmbErrorType    resulth;
+		resulth = SP_ACCESS(m_pCamera)->GetFeatureByName(nameh.c_str(), pFeatureh);
+		if (VmbErrorSuccess == resulth)
+		{
+			resulth = SP_ACCESS(pFeatureh)->SetValue(height);
+		}
+
+		VmbInt64_t offsetx = x;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string name = "OffsetX";
+		FeaturePtr      pFeature;
+		VmbErrorType    result;
+		result = SP_ACCESS(m_pCamera)->GetFeatureByName(name.c_str(), pFeature);
+		if (VmbErrorSuccess == result)
+		{
+			result = SP_ACCESS(pFeature)->SetValue(offsetx);
+		}
+
+		VmbInt64_t offsety = y;
+		//res = SetFeatureIntValue(m_pCamera, "OffsetX", x);
+		std::string namey = "OffsetY";
+		FeaturePtr      pFeature2;
+		VmbErrorType    result2;
+		result2 = SP_ACCESS(m_pCamera)->GetFeatureByName(namey.c_str(), pFeature2);
+		if (VmbErrorSuccess == result2)
+		{
+			result2 = SP_ACCESS(pFeature)->SetValue(offsety);
+		}
+	}
+
+	//close the camera
+	SP_ACCESS(m_pCamera)->Close();
+}
+
 //
 // Translates Vimba error codes to readable error messages
 //
@@ -125,6 +179,30 @@ inline VmbErrorType SetFeatureIntValue( const CameraPtr &camera, const std::stri
     return result;
 }
 
+int ApiController::GetMaxWidth(const std::string &rStrCameraID)
+{
+	VmbInt64_t width = -1;
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		res = GetFeatureIntValue(m_pCamera, "WidthMax", width);
+	}
+	SP_ACCESS(m_pCamera)->Close();
+	return width;
+}
+
+int ApiController::GetMaxHeight(const std::string &rStrCameraID)
+{
+	VmbInt64_t height = -1;
+	VmbErrorType res = m_system.OpenCameraByID(rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera);
+	if (VmbErrorSuccess == res)
+	{
+		res = GetFeatureIntValue(m_pCamera, "HeightMax", height);
+	}
+	SP_ACCESS(m_pCamera)->Close();
+	return height;
+}
+
 //
 // Opens the given camera
 // Sets the maximum possible Ethernet packet size
@@ -145,6 +223,18 @@ VmbErrorType ApiController::StartContinuousImageAcquisition( const std::string &
     VmbErrorType res = m_system.OpenCameraByID( rStrCameraID.c_str(), VmbAccessModeFull, m_pCamera );
     if( VmbErrorSuccess == res )
     {
+		// set roi
+
+		
+
+		//if (VmbErrorSuccess != res)
+		//{
+		//	printf("rip");
+		//}
+		//else if (VmbErrorSuccess == res)
+		//{
+		//	printf("good");
+		//}
         // Set the GeV packet size to the highest possible value
         // (In this example we do not test whether this cam actually is a GigE cam)
         FeaturePtr pCommandFeature;
