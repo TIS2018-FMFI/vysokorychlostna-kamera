@@ -136,6 +136,14 @@ private:
 
 	//time_t oldTime;
 	milliseconds oldTime;
+
+	// replay functions
+	void loadPng(CString path);
+	void replay(CString path);
+	bool IsReplaying = false;
+	int replayFPS = 2;
+	milliseconds oldTimeReplay;
+	milliseconds deltaTimeReplay;
 public:
 	afx_msg void OnBnClickedButtonSetRoi();
 	afx_msg void OnBnClickedButtonReplay();

@@ -456,6 +456,48 @@ void CAsynchronousGrabDlg::OnPaint()
 }
 
 
+void CAsynchronousGrabDlg::loadPng(CString path)
+{
+	CRect rect;
+	m_PictureBoxStream.GetWindowRect(&rect);
+	this->ScreenToClient(&rect);
+
+	CBitmap pngBmp;
+	CDC bmDC;
+	CBitmap *pOldbmp;
+	BITMAP  bi;
+	UINT xPos = rect.left, yPos = rect.top;
+
+	CClientDC dc(this);
+
+	m_Image.Load(path);
+	// new code
+
+	pngBmp.Attach(m_Image.Detach());
+
+	bmDC.CreateCompatibleDC(&dc);
+
+	pOldbmp = bmDC.SelectObject(&pngBmp);
+	pngBmp.GetBitmap(&bi);
+	dc.BitBlt(xPos, yPos, bi.bmWidth, bi.bmHeight, &bmDC, 0, 0, SRCCOPY);
+	bmDC.SelectObject(pOldbmp);
+}
+
+void CAsynchronousGrabDlg::replay(CString path)
+{
+	// Calculate fps
+	milliseconds newTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
+	milliseconds deltaTimeReplay = deltaTimeReplay + (newTime - oldTime);
+	oldTimeReplay = newTime;
+
+	if (deltaTimeReplay.count()/1000 >= replayFPS || IsReplaying == false)
+	{
+		loadPng(path);
+		IsReplaying = true;
+	}
+	
+}
+
 void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 {
 	// TODO: Add your control notification handler code here
@@ -507,24 +549,5 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
 	CString pngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech.png";
-	CImage pngImage;
-	CBitmap pngBmp;
-	CDC bmDC;
-	CBitmap *pOldbmp;
-	BITMAP  bi;
-	UINT xPos = 0, yPos = 0;
-
-	CClientDC dc(this);
-
-	m_Image.Load(pngPath);
-	// new code
-
-	pngBmp.Attach(m_Image.Detach());
-
-	bmDC.CreateCompatibleDC(&dc);
-
-	pOldbmp = bmDC.SelectObject(&pngBmp);
-	pngBmp.GetBitmap(&bi);
-	dc.BitBlt(xPos, yPos, bi.bmWidth, bi.bmHeight, &bmDC, 0, 0, SRCCOPY);
-	bmDC.SelectObject(pOldbmp);
+	replay(pngPath);
 }
