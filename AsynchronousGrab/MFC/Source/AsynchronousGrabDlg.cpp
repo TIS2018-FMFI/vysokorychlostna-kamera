@@ -33,6 +33,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <afxtoolbarimages.h>
 #define NUM_COLORS 3
 #define BIT_DEPTH 8
 
@@ -59,6 +60,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     ON_MESSAGE( WM_FRAME_READY, OnFrameReady )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
+	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -500,4 +502,29 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 		m_ApiController.SetROI(x, y, w, h, m_cameras[nRow]);
 		Log(_TEXT("ROI set"));
 	}
+}
+
+void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
+{
+	CString pngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech.png";
+	CImage pngImage;
+	CBitmap pngBmp;
+	CDC bmDC;
+	CBitmap *pOldbmp;
+	BITMAP  bi;
+	UINT xPos = 0, yPos = 0;
+
+	CClientDC dc(this);
+
+	m_Image.Load(pngPath);
+	// new code
+
+	pngBmp.Attach(m_Image.Detach());
+
+	bmDC.CreateCompatibleDC(&dc);
+
+	pOldbmp = bmDC.SelectObject(&pngBmp);
+	pngBmp.GetBitmap(&bi);
+	dc.BitBlt(xPos, yPos, bi.bmWidth, bi.bmHeight, &bmDC, 0, 0, SRCCOPY);
+	bmDC.SelectObject(pOldbmp);
 }

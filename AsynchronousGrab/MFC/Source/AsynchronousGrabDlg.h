@@ -137,8 +137,9 @@ private:
 	//time_t oldTime;
 	milliseconds oldTime;
 public:
-	CEdit current_fps_label;
 	afx_msg void OnBnClickedButtonSetRoi();
+	afx_msg void OnBnClickedButtonReplay();
+	CEdit current_fps_label;
 	CEdit UppeLeftX;
 	CEdit UpperLeftY;
 	CEdit LowerRightX;
