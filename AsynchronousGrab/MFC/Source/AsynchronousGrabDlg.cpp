@@ -479,7 +479,10 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 
 	pOldbmp = bmDC.SelectObject(&pngBmp);
 	pngBmp.GetBitmap(&bi);
-	dc.BitBlt(xPos, yPos, bi.bmWidth, bi.bmHeight, &bmDC, 0, 0, SRCCOPY);
+	//int ratio = bi.bmWidth / bi.bmHeight;
+	//int width = rect.Width();
+	//int height = rect.Height();
+	dc.BitBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, SRCCOPY);
 	bmDC.SelectObject(pOldbmp);
 }
 
