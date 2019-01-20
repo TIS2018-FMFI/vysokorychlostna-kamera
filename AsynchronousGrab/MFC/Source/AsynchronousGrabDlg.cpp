@@ -33,6 +33,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <afxtoolbarimages.h>
 #define NUM_COLORS 3
 #define BIT_DEPTH 8
 
@@ -59,6 +60,8 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     ON_MESSAGE( WM_FRAME_READY, OnFrameReady )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
+	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -454,6 +457,56 @@ void CAsynchronousGrabDlg::OnPaint()
 }
 
 
+void CAsynchronousGrabDlg::loadPng(CString path)
+{
+	CRect rect;
+	m_PictureBoxStream.GetWindowRect(&rect);
+	this->ScreenToClient(&rect);
+
+	CBitmap pngBmp;
+	CDC bmDC;
+	CBitmap *pOldbmp;
+	BITMAP  bi;
+	UINT xPos = rect.left, yPos = rect.top;
+
+	CClientDC dc(this);
+
+	m_Image.Load(path);
+
+	pngBmp.Attach(m_Image.Detach());
+
+	bmDC.CreateCompatibleDC(&dc);
+
+	pOldbmp = bmDC.SelectObject(&pngBmp);
+	pngBmp.GetBitmap(&bi);
+	//int ratio = bi.bmWidth / bi.bmHeight;
+	//int width = rect.Width();
+	//int height = rect.Height();
+	dc.BitBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, SRCCOPY);
+	bmDC.SelectObject(pOldbmp);
+}
+
+void CAsynchronousGrabDlg::replay()
+{
+	CFileFind finder;
+	replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	CString str;
+	str.Format(_T("%d.png"), frameCounter);
+	replayPngPath.Append(str);
+	if (finder.FindFile(replayPngPath))
+	{
+		loadPng(replayPngPath);
+		IsReplaying = true;
+		frameCounter++;
+	}
+	else
+	{
+		KillTimer(replayTimer);
+		IsReplaying = false;
+		Log(_TEXT("Replay finished."));
+	}
+}
+
 void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 {
 	// TODO: Add your control notification handler code here
@@ -500,4 +553,23 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 		m_ApiController.SetROI(x, y, w, h, m_cameras[nRow]);
 		Log(_TEXT("ROI set"));
 	}
+}
+
+void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
+{
+	replayPngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech_0.png";
+	frameCounter = 0;
+	//replay();
+	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
+}
+
+
+void CAsynchronousGrabDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// Timer for replay
+	if (nIDEvent == 1)
+	{
+		replay();
+	}
+	CDialog::OnTimer(nIDEvent);
 }

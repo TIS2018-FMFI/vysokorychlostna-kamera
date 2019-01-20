@@ -136,12 +136,25 @@ private:
 
 	//time_t oldTime;
 	milliseconds oldTime;
+
+	// replay functions
+	void loadPng(CString path);
+	void replay();
+	CString replayPngPath;
+	int frameCounter;
+	UINT_PTR replayTimer;
+	bool IsReplaying = false;
+	int replayFPS = 2;
+	milliseconds oldTimeReplay;
+	milliseconds deltaTimeReplay;
 public:
-	CEdit current_fps_label;
 	afx_msg void OnBnClickedButtonSetRoi();
+	afx_msg void OnBnClickedButtonReplay();
+	CEdit current_fps_label;
 	CEdit UppeLeftX;
 	CEdit UpperLeftY;
 	CEdit LowerRightX;
 	CEdit LowerRightY;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
