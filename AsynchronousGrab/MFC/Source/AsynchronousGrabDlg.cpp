@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
     ON_MESSAGE( WM_CAMERA_LIST_CHANGED, OnCameraListChanged )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
 	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -471,7 +472,6 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 	CClientDC dc(this);
 
 	m_Image.Load(path);
-	// new code
 
 	pngBmp.Attach(m_Image.Detach());
 
@@ -483,28 +483,25 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 	bmDC.SelectObject(pOldbmp);
 }
 
-void CAsynchronousGrabDlg::replay(CString path)
+void CAsynchronousGrabDlg::replay()
 {
-	// Calculate fps
-	milliseconds newTime = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch());
-	milliseconds deltaTimeReplay = deltaTimeReplay + (newTime - oldTime);
-	oldTimeReplay = newTime;
-
-	if (deltaTimeReplay.count()/1000 >= replayFPS || IsReplaying == false)
+	CFileFind finder;
+	replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	CString str;
+	str.Format(_T("%d.png"), frameCounter);
+	replayPngPath.Append(str);
+	if (finder.FindFile(replayPngPath))
 	{
-		CFileFind finder;
-		if (finder.FindFile(path))
-		{
-			loadPng(path);
-			IsReplaying = true;
-		}
-		else
-		{
-			IsReplaying = false;
-			Log(_TEXT("Replay finished."));
-		}
+		loadPng(replayPngPath);
+		IsReplaying = true;
+		frameCounter++;
 	}
-	
+	else
+	{
+		KillTimer(replayTimer);
+		IsReplaying = false;
+		Log(_TEXT("Replay finished."));
+	}
 }
 
 void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
@@ -557,6 +554,19 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
-	CString pngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech.png";
-	replay(pngPath);
+	replayPngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech_0.png";
+	frameCounter = 0;
+	//replay();
+	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
+}
+
+
+void CAsynchronousGrabDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// Timer for replay
+	if (nIDEvent == 1)
+	{
+		replay();
+	}
+	CDialog::OnTimer(nIDEvent);
 }

@@ -139,7 +139,10 @@ private:
 
 	// replay functions
 	void loadPng(CString path);
-	void replay(CString path);
+	void replay();
+	CString replayPngPath;
+	int frameCounter;
+	UINT_PTR replayTimer;
 	bool IsReplaying = false;
 	int replayFPS = 2;
 	milliseconds oldTimeReplay;
@@ -152,5 +155,6 @@ public:
 	CEdit UpperLeftY;
 	CEdit LowerRightX;
 	CEdit LowerRightY;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
