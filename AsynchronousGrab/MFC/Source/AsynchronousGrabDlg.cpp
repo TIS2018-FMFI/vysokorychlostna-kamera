@@ -492,8 +492,17 @@ void CAsynchronousGrabDlg::replay(CString path)
 
 	if (deltaTimeReplay.count()/1000 >= replayFPS || IsReplaying == false)
 	{
-		loadPng(path);
-		IsReplaying = true;
+		CFileFind finder;
+		if (finder.FindFile(path))
+		{
+			loadPng(path);
+			IsReplaying = true;
+		}
+		else
+		{
+			IsReplaying = false;
+			Log(_TEXT("Replay finished."));
+		}
 	}
 	
 }
