@@ -147,6 +147,11 @@ private:
 	int replayFPS = 2;
 	milliseconds oldTimeReplay;
 	milliseconds deltaTimeReplay;
+
+	// record
+	bool isRecording = false;
+	int savedFrameNumber;
+	CString currentSavingFolder;
 public:
 	afx_msg void OnBnClickedButtonSetRoi();
 	afx_msg void OnBnClickedButtonReplay();
@@ -156,5 +161,6 @@ public:
 	CEdit LowerRightX;
 	CEdit LowerRightY;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedRecordButton();
 };
 

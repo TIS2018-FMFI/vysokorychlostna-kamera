@@ -33,6 +33,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <ctime>
 #include <afxtoolbarimages.h>
 #define NUM_COLORS 3
 #define BIT_DEPTH 8
@@ -62,6 +63,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
 	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_RECORD_BUTTON, &CAsynchronousGrabDlg::OnBnClickedRecordButton)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -75,6 +77,7 @@ BOOL CAsynchronousGrabDlg::OnInitDialog()
     VmbErrorType err = m_ApiController.StartUp();
     string_type DialogTitle( _TEXT( "AsynchronousGrab (MFC version) Vimba V" ) );
     SetWindowText( ( DialogTitle+m_ApiController.GetVersion() ).c_str() );
+	GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
     Log( _TEXT( "Starting Vimba" ), err );
     if( VmbErrorSuccess == err )
     {
@@ -148,12 +151,17 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "|>" ) );
 		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BUTTON_REPLAY)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
     }
     else
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "||" ) );
 		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_REPLAY)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(TRUE);
     }
+	isRecording = false;
 }
 
 //
@@ -308,6 +316,24 @@ void CAsynchronousGrabDlg::CopyToImage( VmbUchar_t *pInBuffer, VmbPixelFormat_t 
     {
         Log( _TEXT( "Error transforming image." ), static_cast<VmbErrorType>( Result ) );
     }
+
+	if (isRecording == true)
+	{
+		//auto savePath = L"C:\\Users\\Jakub\\Pictures\\test\\saved.png";
+		TCHAR szDirectory[MAX_PATH];
+		GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+		CString path = szDirectory;
+		path.Append(_T("\\"));
+		path.Append(currentSavingFolder);
+		path.Append(_T("\\"));
+		CString str;
+		str.Format(_T("%d.png"), savedFrameNumber);
+		path.Append(str); 
+		
+		OutImage.Save(path);
+		savedFrameNumber++;
+	}
 }
 
 //
@@ -572,4 +598,35 @@ void CAsynchronousGrabDlg::OnTimer(UINT_PTR nIDEvent)
 		replay();
 	}
 	CDialog::OnTimer(nIDEvent);
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedRecordButton()
+{
+	// TODO: Add your control notification handler code here
+	if (isRecording == false)
+	{
+		savedFrameNumber = 0;
+		currentSavingFolder = _T("test");
+
+		auto now = std::chrono::system_clock::now();
+		std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+		char * time = std::ctime(&nowTime);
+		CString timeString = CString(time);
+		timeString.Delete(timeString.GetLength()-1,2);
+		timeString.Replace(_T(" "),_T("_"));
+		timeString.Replace(_T(":"), _T("_"));
+		currentSavingFolder = timeString;
+
+		// get surrent dir
+		TCHAR szDirectory[MAX_PATH];
+		GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+		CString path = szDirectory;
+		path.Append(_T("\\"));
+		path.Append(currentSavingFolder);
+
+		bool created = CreateDirectory(path, NULL);
+	}
+	isRecording = !isRecording;
 }
