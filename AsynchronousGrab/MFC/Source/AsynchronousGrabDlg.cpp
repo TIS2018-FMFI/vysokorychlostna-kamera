@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
 	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_RECORD_BUTTON, &CAsynchronousGrabDlg::OnBnClickedRecordButton)
+	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, &CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -602,7 +603,22 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 void CAsynchronousGrabDlg::replay()
 {
 	CFileFind finder;
-	replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	if (frameCounter > 0 && frameCounter <= 10)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	}
+	if (frameCounter > 10 && frameCounter <= 100)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 6, 6);
+	}
+	if (frameCounter > 100 && frameCounter <= 1000)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 7, 7);
+	}
+	if (frameCounter > 1000)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 8, 8);
+	}
 	CString str;
 	str.Format(_T("%d.png"), frameCounter);
 	replayPngPath.Append(str);
@@ -670,8 +686,11 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
-	replayPngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech_0.png";
+	//replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Sun_Feb__3_00_23_06_2019";
+	//if(replayPngPath == NULL)
+
 	frameCounter = 0;
+	replayPngPath.Append(_T("\\"));
 	//replay();
 	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
 }
@@ -720,4 +739,34 @@ void CAsynchronousGrabDlg::OnBnClickedRecordButton()
 		Log(_TEXT("Recording finished."));
 	}
 	isRecording = !isRecording;
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder()
+{
+	// TODO: Add your control notification handler code here
+
+	BROWSEINFO   bi;
+	ZeroMemory(&bi, sizeof(bi));
+	TCHAR   szDisplayName[MAX_PATH];
+	szDisplayName[0] = ' ';
+
+	bi.hwndOwner = NULL;
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = szDisplayName;
+	bi.lpszTitle = _T("Please select a folder :");
+	bi.ulFlags = BIF_RETURNONLYFSDIRS;
+	bi.lParam = NULL;
+	bi.iImage = 0;
+
+	LPITEMIDLIST   pidl = SHBrowseForFolder(&bi);
+	TCHAR   szPathName[MAX_PATH];
+	if (NULL != pidl)
+	{
+		BOOL bRet = SHGetPathFromIDList(pidl, szPathName);
+		if (FALSE == bRet)
+			return;
+		//AfxMessageBox(szPathName);
+		replayPngPath = CString(szPathName);
+	}
 }

@@ -145,7 +145,7 @@ private:
 	int frameCounter;
 	UINT_PTR replayTimer;
 	bool IsReplaying = false;
-	int replayFPS = 2;
+	int replayFPS = 25;
 	milliseconds oldTimeReplay;
 	milliseconds deltaTimeReplay;
 
@@ -168,5 +168,6 @@ public:
 	CEdit LowerRightY;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedRecordButton();
+	afx_msg void OnBnClickedButtonSelectFolder();
 };
 
