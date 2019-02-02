@@ -54,5 +54,5 @@ public:
 };
 
 extern CAsynchronousGrabApp theApp;
-extern CImage bufferArr[10];
+extern CImage * bufferArr[10];
 //extern CImage m_Image;

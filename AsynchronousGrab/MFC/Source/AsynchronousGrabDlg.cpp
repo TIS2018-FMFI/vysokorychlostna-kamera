@@ -78,6 +78,12 @@ BOOL CAsynchronousGrabDlg::OnInitDialog()
     string_type DialogTitle( _TEXT( "AsynchronousGrab (MFC version) Vimba V" ) );
     SetWindowText( ( DialogTitle+m_ApiController.GetVersion() ).c_str() );
 	GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
+
+	for (int i = 0; i < 10; i++)
+	{
+		bufferArr[i] = NULL;
+	}
+
     Log( _TEXT( "Starting Vimba" ), err );
     if( VmbErrorSuccess == err )
     {
@@ -176,8 +182,11 @@ UINT MyThreadProc(LPVOID pParam)
 
 	try
 	{
-		bufferArr[params->index].Save(params->path);
+		bufferArr[params->index]->Save(params->path);
 		//m_Image.Save(params->path);
+		bufferArr[params->index]->Destroy();
+		delete(bufferArr[params->index]);
+		bufferArr[params->index] = NULL;
 	}
 	catch (const std::exception& e)
 	{
@@ -250,47 +259,54 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
 						str.Format(_T("%d.png"), savedFrameNumber);
 						path.Append(str);
 
-						currentIndex = savedFrameNumber % 100;
+						currentIndex = savedFrameNumber % 10;
 						//OutImage.Save(path);
 						//CImage temp;
 
 						try
 						{
-							//bufferArr[currentIndex] = new CImage();
-							bufferArr[currentIndex].Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
-							//temp.Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
-							bool copySuccess = m_Image.BitBlt(bufferArr[currentIndex].GetDC(),0,0,SRCCOPY);
-							bufferArr[currentIndex].ReleaseDC();
-							//CopyToImage(pBuffer, ePixelFormat, bufferArr[currentIndex]);
+							if (bufferArr[currentIndex] == NULL)
+							{
+								bufferArr[currentIndex] = new CImage();
+								bufferArr[currentIndex]->Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+								//temp.Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+								bool copySuccess = m_Image.BitBlt(bufferArr[currentIndex]->GetDC(), 0, 0, SRCCOPY);
+								bufferArr[currentIndex]->ReleaseDC();
+								//CopyToImage(pBuffer, ePixelFormat, bufferArr[currentIndex]);
 
-							//int w = m_Image.GetWidth();
-							//int h = m_Image.GetHeight();
-							//int d = m_Image.GetBPP();
-							//BYTE* oldImg;
-							////create new image...
-							//temp.Create(w, h, d);
-							//int s = temp.GetPitch();
-							//BYTE* newImg = (BYTE*)temp.GetBits();
+								//int w = m_Image.GetWidth();
+								//int h = m_Image.GetHeight();
+								//int d = m_Image.GetBPP();
+								//BYTE* oldImg;
+								////create new image...
+								//temp.Create(w, h, d);
+								//int s = temp.GetPitch();
+								//BYTE* newImg = (BYTE*)temp.GetBits();
 
-							//for (int y = 0; y < h; y++, newImg += s) {
-							//	oldImg = m_Image[y];
-							//	for (int x = 0; x < w; x++) {
-							//		for (int i = 0; i < d; i++)
-							//			*newImg = *oldImg, newImg++, oldImg++;
-							//	}
-							//}
+								//for (int y = 0; y < h; y++, newImg += s) {
+								//	oldImg = m_Image[y];
+								//	for (int x = 0; x < w; x++) {
+								//		for (int i = 0; i < d; i++)
+								//			*newImg = *oldImg, newImg++, oldImg++;
+								//	}
+								//}
 
-							//bufferArr[currentIndex] = temp;
+								//bufferArr[currentIndex] = temp;
 
-							ThreadParams * pthreadparams = new ThreadParams();
-							pthreadparams->index = currentIndex;
-							pthreadparams->path = path;
+								ThreadParams * pthreadparams = new ThreadParams();
+								pthreadparams->index = currentIndex;
+								pthreadparams->path = path;
 
-							AfxBeginThread(MyThreadProc, pthreadparams);
+								AfxBeginThread(MyThreadProc, pthreadparams);
+							}
+							else
+							{
+								Log(_TEXT("skipped frame " + savedFrameNumber));
+							}
 						}
 						catch (const std::exception&)
 						{
-							int aa = 0;
+							Log(_TEXT("copy failed"));
 						}
 
 						savedFrameNumber++;
