@@ -177,6 +177,7 @@ UINT MyThreadProc(LPVOID pParam)
 	try
 	{
 		bufferArr[params->index].Save(params->path);
+		//m_Image.Save(params->path);
 	}
 	catch (const std::exception& e)
 	{
@@ -232,11 +233,7 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
 
                     VmbPixelFormatType ePixelFormat = m_ApiController.GetPixelFormat();
                     CopyToImage( pBuffer,ePixelFormat, m_Image );
-                    // Display it
-                    RECT rect;
-                    m_PictureBoxStream.GetWindowRect( &rect );
-                    ScreenToClient( &rect );
-                    InvalidateRect( &rect, false );
+                    
 
 					// Record it
 					if (isRecording == true)
@@ -253,41 +250,57 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
 						str.Format(_T("%d.png"), savedFrameNumber);
 						path.Append(str);
 
-						currentIndex = savedFrameNumber % 10;
+						currentIndex = savedFrameNumber % 100;
 						//OutImage.Save(path);
-						CImage temp;
-						temp.Create(m_Image.GetWidth(), m_Image.GetHeight(), m_Image.GetBPP());
-						m_Image.BitBlt(temp.GetDC(),0,0);
-						temp.ReleaseDC();
-						//CopyToImage(pBuffer, ePixelFormat, temp);
+						//CImage temp;
 
-						//int w = m_Image.GetWidth();
-						//int h = m_Image.GetHeight();
-						//int d = m_Image.GetBPP();
-						//BYTE* oldImg;
-						////create new image...
-						//temp.Create(w, h, d);
-						//int s = temp.GetPitch();
-						//BYTE* newImg = (BYTE*)temp.GetBits();
+						try
+						{
+							//bufferArr[currentIndex] = new CImage();
+							bufferArr[currentIndex].Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+							//temp.Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+							bool copySuccess = m_Image.BitBlt(bufferArr[currentIndex].GetDC(),0,0,SRCCOPY);
+							bufferArr[currentIndex].ReleaseDC();
+							//CopyToImage(pBuffer, ePixelFormat, bufferArr[currentIndex]);
 
-						//for (int y = 0; y < h; y++, newImg += s) {
-						//	oldImg = m_Image[y];
-						//	for (int x = 0; x < w; x++) {
-						//		for (int i = 0; i < d; i++)
-						//			*newImg = *oldImg, newImg++, oldImg++;
-						//	}
-						//}
+							//int w = m_Image.GetWidth();
+							//int h = m_Image.GetHeight();
+							//int d = m_Image.GetBPP();
+							//BYTE* oldImg;
+							////create new image...
+							//temp.Create(w, h, d);
+							//int s = temp.GetPitch();
+							//BYTE* newImg = (BYTE*)temp.GetBits();
 
-						bufferArr[currentIndex] = temp;
+							//for (int y = 0; y < h; y++, newImg += s) {
+							//	oldImg = m_Image[y];
+							//	for (int x = 0; x < w; x++) {
+							//		for (int i = 0; i < d; i++)
+							//			*newImg = *oldImg, newImg++, oldImg++;
+							//	}
+							//}
 
-						ThreadParams * pthreadparams = new ThreadParams();
-						pthreadparams->index = currentIndex;
-						pthreadparams->path = path;
+							//bufferArr[currentIndex] = temp;
 
-						AfxBeginThread(MyThreadProc, pthreadparams);
+							ThreadParams * pthreadparams = new ThreadParams();
+							pthreadparams->index = currentIndex;
+							pthreadparams->path = path;
+
+							AfxBeginThread(MyThreadProc, pthreadparams);
+						}
+						catch (const std::exception&)
+						{
+							int aa = 0;
+						}
 
 						savedFrameNumber++;
 					}
+
+					// Display it
+					RECT rect;
+					m_PictureBoxStream.GetWindowRect(&rect);
+					ScreenToClient(&rect);
+					InvalidateRect(&rect, false);
                 }
             }
         }
@@ -359,6 +372,7 @@ void CAsynchronousGrabDlg::CopyToImage( VmbUchar_t *pInBuffer, VmbPixelFormat_t 
     const int               nStride         = OutImage.GetPitch();
     const int               nBitsPerPixel   = OutImage.GetBPP();
     VmbError_t              Result;
+
     if( ( nWidth*nBitsPerPixel ) /8 != nStride )
     {
         Log( _TEXT( "Vimba only supports stride that is equal to width." ), VmbErrorWrongType );

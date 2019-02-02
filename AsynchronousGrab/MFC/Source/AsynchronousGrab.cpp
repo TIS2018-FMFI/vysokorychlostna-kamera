@@ -55,6 +55,7 @@ CAsynchronousGrabApp::CAsynchronousGrabApp()
 CAsynchronousGrabApp theApp;
 
 CImage bufferArr[10];
+//CImage m_Image;
 
 
 // CAsynchronousGrabApp initialization
