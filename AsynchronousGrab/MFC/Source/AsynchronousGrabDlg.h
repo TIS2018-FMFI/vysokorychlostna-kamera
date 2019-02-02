@@ -40,6 +40,7 @@
 using AVT::VmbAPI::Examples::ApiController;
 using namespace std::chrono;
 
+
 class CAsynchronousGrabDlg : public CDialog
 {
 public:
@@ -152,6 +153,11 @@ private:
 	bool isRecording = false;
 	int savedFrameNumber;
 	CString currentSavingFolder;
+	//CImage bufferArr [10];
+	int currentIndex;
+	int bufferSize;
+	//UINT MyThreadProc(LPVOID pParam);
+
 public:
 	afx_msg void OnBnClickedButtonSetRoi();
 	afx_msg void OnBnClickedButtonReplay();

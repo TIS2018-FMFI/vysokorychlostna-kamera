@@ -164,6 +164,28 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
 	isRecording = false;
 }
 
+struct ThreadParams
+{
+	int index;
+	CString path;
+};
+
+UINT MyThreadProc(LPVOID pParam)
+{
+	ThreadParams * params = (ThreadParams*)pParam;
+
+	try
+	{
+		bufferArr[params->index].Save(params->path);
+	}
+	catch (const std::exception& e)
+	{
+		int a = 1;
+	}
+	
+	return 0;
+}
+
 //
 // This event handler is triggered through a MFC message posted by the frame observer
 //
@@ -215,6 +237,57 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
                     m_PictureBoxStream.GetWindowRect( &rect );
                     ScreenToClient( &rect );
                     InvalidateRect( &rect, false );
+
+					// Record it
+					if (isRecording == true)
+					{
+						//auto savePath = L"C:\\Users\\Jakub\\Pictures\\test\\saved.png";
+						TCHAR szDirectory[MAX_PATH];
+						GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+						CString path = szDirectory;
+						path.Append(_T("\\"));
+						path.Append(currentSavingFolder);
+						path.Append(_T("\\"));
+						CString str;
+						str.Format(_T("%d.png"), savedFrameNumber);
+						path.Append(str);
+
+						currentIndex = savedFrameNumber % 10;
+						//OutImage.Save(path);
+						CImage temp;
+						temp.Create(m_Image.GetWidth(), m_Image.GetHeight(), m_Image.GetBPP());
+						m_Image.BitBlt(temp.GetDC(),0,0);
+						temp.ReleaseDC();
+						//CopyToImage(pBuffer, ePixelFormat, temp);
+
+						//int w = m_Image.GetWidth();
+						//int h = m_Image.GetHeight();
+						//int d = m_Image.GetBPP();
+						//BYTE* oldImg;
+						////create new image...
+						//temp.Create(w, h, d);
+						//int s = temp.GetPitch();
+						//BYTE* newImg = (BYTE*)temp.GetBits();
+
+						//for (int y = 0; y < h; y++, newImg += s) {
+						//	oldImg = m_Image[y];
+						//	for (int x = 0; x < w; x++) {
+						//		for (int i = 0; i < d; i++)
+						//			*newImg = *oldImg, newImg++, oldImg++;
+						//	}
+						//}
+
+						bufferArr[currentIndex] = temp;
+
+						ThreadParams * pthreadparams = new ThreadParams();
+						pthreadparams->index = currentIndex;
+						pthreadparams->path = path;
+
+						AfxBeginThread(MyThreadProc, pthreadparams);
+
+						savedFrameNumber++;
+					}
                 }
             }
         }
@@ -316,25 +389,9 @@ void CAsynchronousGrabDlg::CopyToImage( VmbUchar_t *pInBuffer, VmbPixelFormat_t 
     {
         Log( _TEXT( "Error transforming image." ), static_cast<VmbErrorType>( Result ) );
     }
-
-	if (isRecording == true)
-	{
-		//auto savePath = L"C:\\Users\\Jakub\\Pictures\\test\\saved.png";
-		TCHAR szDirectory[MAX_PATH];
-		GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
-
-		CString path = szDirectory;
-		path.Append(_T("\\"));
-		path.Append(currentSavingFolder);
-		path.Append(_T("\\"));
-		CString str;
-		str.Format(_T("%d.png"), savedFrameNumber);
-		path.Append(str); 
-		
-		OutImage.Save(path);
-		savedFrameNumber++;
-	}
 }
+
+
 
 //
 // Queries and lists all known camera
@@ -627,6 +684,10 @@ void CAsynchronousGrabDlg::OnBnClickedRecordButton()
 		path.Append(currentSavingFolder);
 
 		bool created = CreateDirectory(path, NULL);
+		Log(_TEXT("Recording."));
+	}
+	else {
+		Log(_TEXT("Recording finished."));
 	}
 	isRecording = !isRecording;
 }
