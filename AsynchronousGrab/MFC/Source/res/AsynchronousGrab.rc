@@ -1,0 +1,197 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""AsynchronousGrab.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "AsynchronousGrab.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ASYNCHRONOUSGRAB_DIALOG DIALOGEX 0, 0, 911, 439
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "AsynchronousGrab (MFC version)"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "|>",IDC_BUTTON_STARTSTOP,202,219,30,14
+    LISTBOX         IDC_LIST_CAMERAS,782,44,122,66,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST_LOG,690,116,214,100,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_PICTURE_STREAM,"Static",SS_BLACKFRAME,7,7,459,210
+    GROUPBOX        "Nastavenia",IDC_STATIC_SETTINGS,7,236,461,196
+    GROUPBOX        "Nastavenia kamery",IDC_STATIC_CAMERA_SETTINGS,15,248,175,177
+    GROUPBOX        "nastavenia ROI a FPS",IDC_STATIC_RIO_SETTINGS,202,250,256,174
+    LTEXT           "LH roh",IDC_UL_LABEL,223,284,22,8
+    LTEXT           "PD roh",IDC_STATIC_LR_LABEL,217,318,22,8
+    EDITTEXT        IDC_INPUT_UL_X,286,282,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_INPUT_UL_Y,369,281,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_INPUT_LR_X,287,317,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_INPUT_LR_Y,372,316,40,14,ES_AUTOHSCROLL
+    LTEXT           "FPS",IDC_STATIC_FPS_LABEL,220,369,13,8
+    COMBOBOX        IDC_COMBO_FPS,289,367,51,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Aktuálny priecinok",IDC_STATIC,477,7,194,425
+    EDITTEXT        IDC_INPUT_PATH,491,17,122,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_SELECT_FOLDER,617,17,50,14
+    LISTBOX         IDC_LIST_ITEMS,491,48,163,362,LBS_SORT | LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Obsah adresára",IDC_STATIC_FOLDER_LABEL,491,36,52,8
+    EDITTEXT        IDC_EDIT_CURRENT_FPS,390,220,40,14,ES_AUTOHSCROLL | ES_READONLY | WS_DISABLED
+    PUSHBUTTON      "Set ROI",IDC_BUTTON_SET_ROI,274,343,50,14
+    PUSHBUTTON      "Replay",IDC_BUTTON_REPLAY,246,220,50,14
+    PUSHBUTTON      "Button1",IDC_BUTTON1,125,219,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Allied Vision Technologies"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "AsynchronousGrab.exe"
+            VALUE "LegalCopyright", "(c)Allied Vision Technologies.  All rights reserved."
+            VALUE "OriginalFilename", "AsynchronousGrab.exe"
+            VALUE "ProductName", "Vimba Example for asynchronous image acquisition"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ASYNCHRONOUSGRAB_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 904
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 432
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ASYNCHRONOUSGRAB_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "AsynchronousGrab.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
