@@ -593,14 +593,13 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 
 	pOldbmp = bmDC.SelectObject(&pngBmp);
 	pngBmp.GetBitmap(&bi);
-	//int ratio = bi.bmWidth / bi.bmHeight;
-	//int width = rect.Width();
-	//int height = rect.Height();
+
 	//dc.BitBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, SRCCOPY);
-	int rectNewWidth = bi.bmWidth * (rect.Height() / bi.bmHeight);
-	//((rect.Width-rectNewWidth)/2)
+	float ratio = ((float)rect.Height() / (float)bi.bmHeight);
+	int rectNewWidth = bi.bmWidth * ratio;
+	int xOffset = ((rect.Width() - rectNewWidth) / 2);
 	dc.SetStretchBltMode(HALFTONE);
-	dc.StretchBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, bi.bmWidth, bi.bmHeight, SRCCOPY);
+	dc.StretchBlt(xPos + xOffset, yPos, rectNewWidth, rect.Height(), &bmDC, 0, 0, bi.bmWidth, bi.bmHeight, SRCCOPY);
 	bmDC.SelectObject(pOldbmp);
 }
 
@@ -696,14 +695,23 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
-	replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
-	//if(replayPngPath == NULL)
+	if (IsReplaying)
+	{
+		KillTimer(replayTimer);
+		IsReplaying = false;
+		Log(_TEXT("Replay finished."));
+	}
+	else
+	{
+		replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
+		//if(replayPngPath == NULL)
 
-	frameCounter = 0;
-	lastNumDig = 1;
-	//replayPngPath.Append(_T("\\0.png"));
-	//replay();
-	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
+		frameCounter = 0;
+		lastNumDig = 1;
+		//replayPngPath.Append(_T("\\0.png"));
+		//replay();
+		replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
+	}
 }
 
 
