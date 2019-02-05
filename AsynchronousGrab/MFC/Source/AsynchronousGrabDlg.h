@@ -157,6 +157,7 @@ private:
 	int currentIndex;
 	int bufferSize;
 	//UINT MyThreadProc(LPVOID pParam);
+	int lastNumDig;
 
 public:
 	afx_msg void OnBnClickedButtonSetRoi();

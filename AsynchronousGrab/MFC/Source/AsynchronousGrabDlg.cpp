@@ -600,27 +600,33 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 	bmDC.SelectObject(pOldbmp);
 }
 
+int numDigits(int number)
+{
+	int digits = 0;
+	if (number <= 0) digits = 1;
+	while (number) {
+		number /= 10;
+		digits++;
+	}
+	return digits;
+}
+
 void CAsynchronousGrabDlg::replay()
 {
 	CFileFind finder;
-	if (frameCounter > 0 && frameCounter <= 10)
+	
+	if (frameCounter > 0)
 	{
-		replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+		int numOfDig = numDigits(frameCounter);
+		replayPngPath.Delete(replayPngPath.GetLength() - (5 + lastNumDig), (5 + lastNumDig));
+		if (numOfDig > lastNumDig)
+		{
+			lastNumDig++;
+		}
 	}
-	if (frameCounter > 10 && frameCounter <= 100)
-	{
-		replayPngPath.Delete(replayPngPath.GetLength() - 6, 6);
-	}
-	if (frameCounter > 100 && frameCounter <= 1000)
-	{
-		replayPngPath.Delete(replayPngPath.GetLength() - 7, 7);
-	}
-	if (frameCounter > 1000)
-	{
-		replayPngPath.Delete(replayPngPath.GetLength() - 8, 8);
-	}
+
 	CString str;
-	str.Format(_T("%d.png"), frameCounter);
+	str.Format(_T("\\%d.png"), frameCounter);
 	replayPngPath.Append(str);
 	if (finder.FindFile(replayPngPath))
 	{
@@ -686,11 +692,12 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
-	//replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Sun_Feb__3_00_23_06_2019";
+	replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
 	//if(replayPngPath == NULL)
 
 	frameCounter = 0;
-	replayPngPath.Append(_T("\\"));
+	lastNumDig = 1;
+	//replayPngPath.Append(_T("\\0.png"));
 	//replay();
 	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
 }
