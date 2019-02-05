@@ -33,6 +33,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <ctime>
 #include <afxtoolbarimages.h>
 #define NUM_COLORS 3
 #define BIT_DEPTH 8
@@ -62,6 +63,8 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
 	ON_BN_CLICKED(IDC_BUTTON_SET_ROI, &CAsynchronousGrabDlg::OnBnClickedButtonSetRoi)
 	ON_BN_CLICKED(IDC_BUTTON_REPLAY, &CAsynchronousGrabDlg::OnBnClickedButtonReplay)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_RECORD_BUTTON, &CAsynchronousGrabDlg::OnBnClickedRecordButton)
+	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, &CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -75,6 +78,13 @@ BOOL CAsynchronousGrabDlg::OnInitDialog()
     VmbErrorType err = m_ApiController.StartUp();
     string_type DialogTitle( _TEXT( "AsynchronousGrab (MFC version) Vimba V" ) );
     SetWindowText( ( DialogTitle+m_ApiController.GetVersion() ).c_str() );
+	GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
+
+	for (int i = 0; i < 10; i++)
+	{
+		bufferArr[i] = NULL;
+	}
+
     Log( _TEXT( "Starting Vimba" ), err );
     if( VmbErrorSuccess == err )
     {
@@ -148,12 +158,43 @@ void CAsynchronousGrabDlg::OnBnClickedButtonStartstop()
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "|>" ) );
 		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BUTTON_REPLAY)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
     }
     else
     {
         m_ButtonStartStop.SetWindowText( _TEXT( "||" ) );
 		GetDlgItem(IDC_BUTTON_SET_ROI)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_REPLAY)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(TRUE);
     }
+	isRecording = false;
+}
+
+struct ThreadParams
+{
+	int index;
+	CString path;
+};
+
+UINT MyThreadProc(LPVOID pParam)
+{
+	ThreadParams * params = (ThreadParams*)pParam;
+
+	try
+	{
+		bufferArr[params->index]->Save(params->path);
+		//m_Image.Save(params->path);
+		bufferArr[params->index]->Destroy();
+		delete(bufferArr[params->index]);
+		bufferArr[params->index] = NULL;
+	}
+	catch (const std::exception& e)
+	{
+		int a = 1;
+	}
+	
+	return 0;
 }
 
 //
@@ -202,11 +243,81 @@ LRESULT CAsynchronousGrabDlg::OnFrameReady( WPARAM status, LPARAM lParam )
 
                     VmbPixelFormatType ePixelFormat = m_ApiController.GetPixelFormat();
                     CopyToImage( pBuffer,ePixelFormat, m_Image );
-                    // Display it
-                    RECT rect;
-                    m_PictureBoxStream.GetWindowRect( &rect );
-                    ScreenToClient( &rect );
-                    InvalidateRect( &rect, false );
+                    
+
+					// Record it
+					if (isRecording == true)
+					{
+						//auto savePath = L"C:\\Users\\Jakub\\Pictures\\test\\saved.png";
+						TCHAR szDirectory[MAX_PATH];
+						GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+						CString path = szDirectory;
+						path.Append(_T("\\"));
+						path.Append(currentSavingFolder);
+						path.Append(_T("\\"));
+						CString str;
+						str.Format(_T("%d.png"), savedFrameNumber);
+						path.Append(str);
+
+						currentIndex = savedFrameNumber % 10;
+						//OutImage.Save(path);
+						//CImage temp;
+
+						try
+						{
+							if (bufferArr[currentIndex] == NULL)
+							{
+								bufferArr[currentIndex] = new CImage();
+								bufferArr[currentIndex]->Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+								//temp.Create(m_Image.GetWidth(), -m_Image.GetHeight(), NUM_COLORS * BIT_DEPTH);
+								bool copySuccess = m_Image.BitBlt(bufferArr[currentIndex]->GetDC(), 0, 0, SRCCOPY);
+								bufferArr[currentIndex]->ReleaseDC();
+								//CopyToImage(pBuffer, ePixelFormat, bufferArr[currentIndex]);
+
+								//int w = m_Image.GetWidth();
+								//int h = m_Image.GetHeight();
+								//int d = m_Image.GetBPP();
+								//BYTE* oldImg;
+								////create new image...
+								//temp.Create(w, h, d);
+								//int s = temp.GetPitch();
+								//BYTE* newImg = (BYTE*)temp.GetBits();
+
+								//for (int y = 0; y < h; y++, newImg += s) {
+								//	oldImg = m_Image[y];
+								//	for (int x = 0; x < w; x++) {
+								//		for (int i = 0; i < d; i++)
+								//			*newImg = *oldImg, newImg++, oldImg++;
+								//	}
+								//}
+
+								//bufferArr[currentIndex] = temp;
+
+								ThreadParams * pthreadparams = new ThreadParams();
+								pthreadparams->index = currentIndex;
+								pthreadparams->path = path;
+
+								AfxBeginThread(MyThreadProc, pthreadparams);
+							}
+							else
+							{
+								Log(_TEXT("skipped frame " + savedFrameNumber));
+							}
+						}
+						catch (const std::exception&)
+						{
+							Log(_TEXT("copy failed"));
+						}
+
+						savedFrameNumber++;
+					}
+
+					// Display it
+					RECT rect;
+					m_PictureBoxStream.GetWindowRect(&rect);
+					ScreenToClient(&rect);
+					InvalidateRect(&rect, false);
                 }
             }
         }
@@ -278,6 +389,7 @@ void CAsynchronousGrabDlg::CopyToImage( VmbUchar_t *pInBuffer, VmbPixelFormat_t 
     const int               nStride         = OutImage.GetPitch();
     const int               nBitsPerPixel   = OutImage.GetBPP();
     VmbError_t              Result;
+
     if( ( nWidth*nBitsPerPixel ) /8 != nStride )
     {
         Log( _TEXT( "Vimba only supports stride that is equal to width." ), VmbErrorWrongType );
@@ -309,6 +421,8 @@ void CAsynchronousGrabDlg::CopyToImage( VmbUchar_t *pInBuffer, VmbPixelFormat_t 
         Log( _TEXT( "Error transforming image." ), static_cast<VmbErrorType>( Result ) );
     }
 }
+
+
 
 //
 // Queries and lists all known camera
@@ -489,7 +603,22 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 void CAsynchronousGrabDlg::replay()
 {
 	CFileFind finder;
-	replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	if (frameCounter > 0 && frameCounter <= 10)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 5, 5);
+	}
+	if (frameCounter > 10 && frameCounter <= 100)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 6, 6);
+	}
+	if (frameCounter > 100 && frameCounter <= 1000)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 7, 7);
+	}
+	if (frameCounter > 1000)
+	{
+		replayPngPath.Delete(replayPngPath.GetLength() - 8, 8);
+	}
 	CString str;
 	str.Format(_T("%d.png"), frameCounter);
 	replayPngPath.Append(str);
@@ -557,8 +686,11 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSetRoi()
 
 void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
-	replayPngPath = L"C:\\Users\\Jakub\\Pictures\\test\\orech_0.png";
+	//replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Sun_Feb__3_00_23_06_2019";
+	//if(replayPngPath == NULL)
+
 	frameCounter = 0;
+	replayPngPath.Append(_T("\\"));
 	//replay();
 	replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
 }
@@ -572,4 +704,69 @@ void CAsynchronousGrabDlg::OnTimer(UINT_PTR nIDEvent)
 		replay();
 	}
 	CDialog::OnTimer(nIDEvent);
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedRecordButton()
+{
+	// TODO: Add your control notification handler code here
+	if (isRecording == false)
+	{
+		savedFrameNumber = 0;
+		currentSavingFolder = _T("test");
+
+		auto now = std::chrono::system_clock::now();
+		std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+		char * time = std::ctime(&nowTime);
+		CString timeString = CString(time);
+		timeString.Delete(timeString.GetLength()-1,2);
+		timeString.Replace(_T(" "),_T("_"));
+		timeString.Replace(_T(":"), _T("_"));
+		currentSavingFolder = timeString;
+
+		// get surrent dir
+		TCHAR szDirectory[MAX_PATH];
+		GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+		CString path = szDirectory;
+		path.Append(_T("\\"));
+		path.Append(currentSavingFolder);
+
+		bool created = CreateDirectory(path, NULL);
+		Log(_TEXT("Recording."));
+	}
+	else {
+		Log(_TEXT("Recording finished."));
+	}
+	isRecording = !isRecording;
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder()
+{
+	// TODO: Add your control notification handler code here
+
+	BROWSEINFO   bi;
+	ZeroMemory(&bi, sizeof(bi));
+	TCHAR   szDisplayName[MAX_PATH];
+	szDisplayName[0] = ' ';
+
+	bi.hwndOwner = NULL;
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = szDisplayName;
+	bi.lpszTitle = _T("Please select a folder :");
+	bi.ulFlags = BIF_RETURNONLYFSDIRS;
+	bi.lParam = NULL;
+	bi.iImage = 0;
+
+	LPITEMIDLIST   pidl = SHBrowseForFolder(&bi);
+	TCHAR   szPathName[MAX_PATH];
+	if (NULL != pidl)
+	{
+		BOOL bRet = SHGetPathFromIDList(pidl, szPathName);
+		if (FALSE == bRet)
+			return;
+		//AfxMessageBox(szPathName);
+		replayPngPath = CString(szPathName);
+	}
 }

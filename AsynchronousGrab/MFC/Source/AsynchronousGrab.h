@@ -33,6 +33,7 @@
 #endif
 
 #include "res\resource.h"        // main symbols
+#include <atlimage.h>
 
 // CAsynchronousGrabApp:
 // See AsynchronousGrab.cpp for the implementation of this class
@@ -53,3 +54,5 @@ public:
 };
 
 extern CAsynchronousGrabApp theApp;
+extern CImage * bufferArr[10];
+//extern CImage m_Image;
