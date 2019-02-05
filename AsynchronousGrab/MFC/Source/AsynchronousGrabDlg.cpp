@@ -596,7 +596,11 @@ void CAsynchronousGrabDlg::loadPng(CString path)
 	//int ratio = bi.bmWidth / bi.bmHeight;
 	//int width = rect.Width();
 	//int height = rect.Height();
-	dc.BitBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, SRCCOPY);
+	//dc.BitBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, SRCCOPY);
+	int rectNewWidth = bi.bmWidth * (rect.Height() / bi.bmHeight);
+	//((rect.Width-rectNewWidth)/2)
+	dc.SetStretchBltMode(HALFTONE);
+	dc.StretchBlt(xPos, yPos, rect.Width(), rect.Height(), &bmDC, 0, 0, bi.bmWidth, bi.bmHeight, SRCCOPY);
 	bmDC.SelectObject(pOldbmp);
 }
 
