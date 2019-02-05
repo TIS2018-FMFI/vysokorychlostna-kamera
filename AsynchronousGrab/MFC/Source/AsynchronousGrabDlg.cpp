@@ -706,7 +706,7 @@ void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 	else
 	{
 		GetDlgItem(IDC_BUTTON_STARTSTOP)->EnableWindow(FALSE);
-		replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
+		//replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
 		//if(replayPngPath == NULL)
 
 		frameCounter = 0;
