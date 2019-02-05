@@ -639,6 +639,7 @@ void CAsynchronousGrabDlg::replay()
 	}
 	else
 	{
+		GetDlgItem(IDC_BUTTON_STARTSTOP)->EnableWindow(TRUE);
 		KillTimer(replayTimer);
 		IsReplaying = false;
 		Log(_TEXT("Replay finished."));
@@ -697,12 +698,14 @@ void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 {
 	if (IsReplaying)
 	{
+		GetDlgItem(IDC_BUTTON_STARTSTOP)->EnableWindow(TRUE);
 		KillTimer(replayTimer);
 		IsReplaying = false;
 		Log(_TEXT("Replay finished."));
 	}
 	else
 	{
+		GetDlgItem(IDC_BUTTON_STARTSTOP)->EnableWindow(FALSE);
 		replayPngPath = L"D:\\Visual_studio\\VysokoRychlostnaKamera\\AsynchronousGrab\\MFC\\Build\\VS2010\\Tue_Feb__5_20_01_01_2019";
 		//if(replayPngPath == NULL)
 
