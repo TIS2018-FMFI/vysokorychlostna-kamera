@@ -511,7 +511,7 @@ void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control(pDX, IDC_LIST_LOG, m_ListLog);
 	DDX_Control(pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop);
 	DDX_Control(pDX, IDC_PICTURE_STREAM, m_PictureBoxStream);
-	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
+	//DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
 	DDX_Control(pDX, IDC_INPUT_UL_X, UppeLeftX);
 	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
 	DDX_Control(pDX, IDC_INPUT_LR_X, LowerRightX);
