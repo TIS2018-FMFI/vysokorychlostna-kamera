@@ -167,8 +167,10 @@ public:
 	CEdit UpperLeftY;
 	CEdit LowerRightX;
 	CEdit LowerRightY;
+	CEdit ExposureTime;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedRecordButton();
 	afx_msg void OnBnClickedButtonSelectFolder();
+	afx_msg void OnBnClickedButtonSetExposure();
 };
 

@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_RECORD_BUTTON, &CAsynchronousGrabDlg::OnBnClickedRecordButton)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, &CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder)
+	ON_BN_CLICKED(IDC_BUTTON_SET_EXPOSURE, &CAsynchronousGrabDlg::OnBnClickedButtonSetExposure)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -516,6 +517,7 @@ void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
 	DDX_Control(pDX, IDC_INPUT_LR_X, LowerRightX);
 	DDX_Control(pDX, IDC_INPUT_LR_Y, LowerRightY);
+	DDX_Control(pDX, IDC_EDIT_EXPOSURE_TIME, ExposureTime);
 }
 
 template <typename T>
@@ -791,4 +793,14 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder()
 		//AfxMessageBox(szPathName);
 		replayPngPath = CString(szPathName);
 	}
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSetExposure()
+{
+	UpdateData(TRUE);
+	CString text;
+	ExposureTime.GetWindowText(text);
+	int expo = _wtoi(text);
+	m_ApiController.SetExposure(double(expo), false);
 }
