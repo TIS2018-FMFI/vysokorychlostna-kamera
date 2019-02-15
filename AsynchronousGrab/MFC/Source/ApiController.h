@@ -60,7 +60,12 @@ class ApiController
 	void SetROI(int x,int y,int w,int h, const std::string &rStrCameraID);
 	int GetMaxWidth(const std::string &rStrCameraID);
 	int GetMaxHeight(const std::string &rStrCameraID);
-    //
+    
+	bool SetFullRate(bool enable);
+	bool SetExposure(double exposure, bool isAuto);
+	bool SetFPS(double fps);
+
+	//
     // Starts the Vimba API and loads all transport layers
     //
     // Returns:

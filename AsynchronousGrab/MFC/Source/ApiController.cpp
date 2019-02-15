@@ -36,6 +36,9 @@ namespace Examples {
 
 enum { NUM_FRAMES = 3, };
 
+#define AUTO_VALUE_OFF "Off"
+#define AUTO_VALUE_ON "Continuous"
+
 ApiController::ApiController()
 // Get a reference to the Vimba singleton
     : m_system( VimbaSystem::GetInstance() )
@@ -203,6 +206,96 @@ int ApiController::GetMaxHeight(const std::string &rStrCameraID)
 	return height;
 }
 
+
+bool ApiController::SetFullRate(bool enable)
+{
+	if (m_pCamera == NULL)
+		return false;
+	
+	FeaturePtr pFeature;
+	VmbErrorType err = m_pCamera->GetFeatureByName("AcquisitionFrameRateMode", pFeature);
+	if (err != VmbErrorSuccess)
+		return false;
+
+	// feature value
+	CStringA valueStr;
+	if (enable)
+		valueStr = _T("Off");
+	else
+		valueStr = _T("Basic");
+
+	// set value
+	err = pFeature->SetValue(valueStr);
+
+	return (err == VmbErrorSuccess);
+}
+
+
+bool ApiController::SetExposure(double exposure, bool isAuto)
+{
+	if (m_pCamera == NULL)
+		return false;
+	
+	FeaturePtr pFeature;
+	VmbErrorType err;
+
+	err = m_pCamera->GetFeatureByName("ExposureTime", pFeature);
+	if (err == VmbErrorNotFound)
+		err = m_pCamera->GetFeatureByName("ExposureTimeAbs", pFeature);
+	if (err != VmbErrorSuccess) return false;
+
+	// exposure
+	err = pFeature->SetValue(round(exposure));
+	if (err != VmbErrorSuccess) return false;
+
+	// auto exposure
+	err = m_pCamera->GetFeatureByName("ExposureAuto", pFeature);
+	if (err == VmbErrorSuccess)
+	{
+		err = pFeature->SetValue(isAuto ? AUTO_VALUE_ON : AUTO_VALUE_OFF);
+		if (err != VmbErrorSuccess) return false;
+	}
+	else if (err == VmbErrorNotFound)
+	{
+		if (isAuto)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
+bool ApiController::SetFPS(double fps)
+{
+	if (m_pCamera == NULL)
+		return false;
+	
+	FeaturePtr pFeature;
+	VmbErrorType err = m_pCamera->GetFeatureByName("AcquisitionFrameRate", pFeature);
+	if (VmbErrorSuccess != err)
+	{
+		err = m_pCamera->GetFeatureByName("AcquisitionFrameRateAbs", pFeature);
+		if (VmbErrorSuccess != err)
+			return false;
+	}
+
+	err = pFeature->SetValue(fps);
+	if (VmbErrorSuccess != err) return false;
+
+	//////////////////////////////////////////////////////////////////////////
+	// DO NOT SWITCH CAMERA TRIGGER TO FIXEDRATE
+	// REASON: Lebo set FPS ma setnut iba feature fps a nic viac.
+	//SetTrigger(ETA_RISING_EDGE, ETS_FIXEDRATE, 0);
+
+	return true;
+}
+
 //
 // Opens the given camera
 // Sets the maximum possible Ethernet packet size
@@ -269,7 +362,16 @@ VmbErrorType ApiController::StartContinuousImageAcquisition( const std::string &
                     // Fall back to Mono
                     res = SetFeatureIntValue( m_pCamera,"PixelFormat", VmbPixelFormatMono8 );
                 }
-                // Read back the currently selected pixel format
+                
+				
+				
+
+				bool retVal = SetFullRate(false);
+				retVal = SetExposure(2500.0, false) && retVal;
+				retVal = SetFPS(45) && retVal;
+				
+				
+				// Read back the currently selected pixel format
                 res =  GetFeatureIntValue( m_pCamera, "PixelFormat", m_nPixelFormat );
 
                 if( VmbErrorSuccess == res )

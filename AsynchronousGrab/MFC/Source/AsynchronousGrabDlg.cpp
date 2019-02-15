@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP( CAsynchronousGrabDlg, CDialog )
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_RECORD_BUTTON, &CAsynchronousGrabDlg::OnBnClickedRecordButton)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, &CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder)
+	ON_BN_CLICKED(IDC_BUTTON_SET_EXPOSURE, &CAsynchronousGrabDlg::OnBnClickedButtonSetExposure)
 END_MESSAGE_MAP()
 
 BOOL CAsynchronousGrabDlg::OnInitDialog()
@@ -79,6 +80,7 @@ BOOL CAsynchronousGrabDlg::OnInitDialog()
     string_type DialogTitle( _TEXT( "AsynchronousGrab (MFC version) Vimba V" ) );
     SetWindowText( ( DialogTitle+m_ApiController.GetVersion() ).c_str() );
 	GetDlgItem(IDC_RECORD_BUTTON)->EnableWindow(FALSE);
+	//GetDlgItem(IDC_EDIT_REPLAY_FPS)->SetWindowTextA("2000");
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -511,11 +513,13 @@ void CAsynchronousGrabDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control(pDX, IDC_LIST_LOG, m_ListLog);
 	DDX_Control(pDX, IDC_BUTTON_STARTSTOP, m_ButtonStartStop);
 	DDX_Control(pDX, IDC_PICTURE_STREAM, m_PictureBoxStream);
-	DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
+	//DDX_Control(pDX, IDC_EDIT_CURRENT_FPS, current_fps_label);
 	DDX_Control(pDX, IDC_INPUT_UL_X, UppeLeftX);
 	DDX_Control(pDX, IDC_INPUT_UL_Y, UpperLeftY);
 	DDX_Control(pDX, IDC_INPUT_LR_X, LowerRightX);
 	DDX_Control(pDX, IDC_INPUT_LR_Y, LowerRightY);
+	DDX_Control(pDX, IDC_EDIT_EXPOSURE_TIME, ExposureTime); 
+	DDX_Control(pDX, IDC_EDIT_REPLAY_FPS, ReplayFPSInput);
 }
 
 template <typename T>
@@ -713,6 +717,10 @@ void CAsynchronousGrabDlg::OnBnClickedButtonReplay()
 		lastNumDig = 1;
 		//replayPngPath.Append(_T("\\0.png"));
 		//replay();
+		CString text;
+		ReplayFPSInput.GetWindowText(text);
+		if(_wtoi(text))
+			replayFPS = _wtoi(text);
 		replayTimer = SetTimer(1, 1000 / replayFPS, NULL); // one event every 1000 ms = 1 s
 	}
 }
@@ -791,4 +799,14 @@ void CAsynchronousGrabDlg::OnBnClickedButtonSelectFolder()
 		//AfxMessageBox(szPathName);
 		replayPngPath = CString(szPathName);
 	}
+}
+
+
+void CAsynchronousGrabDlg::OnBnClickedButtonSetExposure()
+{
+	UpdateData(TRUE);
+	CString text;
+	ExposureTime.GetWindowText(text);
+	int expo = _wtoi(text);
+	m_ApiController.SetExposure(double(expo), false);
 }
