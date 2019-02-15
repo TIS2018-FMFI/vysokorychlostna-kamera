@@ -168,6 +168,7 @@ public:
 	CEdit LowerRightX;
 	CEdit LowerRightY;
 	CEdit ExposureTime;
+	CEdit ReplayFPSInput;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedRecordButton();
 	afx_msg void OnBnClickedButtonSelectFolder();
